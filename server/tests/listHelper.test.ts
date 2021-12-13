@@ -1,4 +1,9 @@
-import {totalLikes, favoriteBlog, mostBlogs} from '../utils/listHelper';
+import {
+  totalLikes,
+  favoriteBlog,
+  mostBlogs,
+  mostLikes,
+} from '../utils/listHelper';
 
 import {Blog, BlogData} from '../types/index';
 
@@ -89,7 +94,7 @@ describe('favorite blog', () => {
 });
 
 describe('most blogs', () => {
-  test('of empty list is zero', () => {
+  test('of empty list is undefined', () => {
     expect(mostBlogs([])).toBe(undefined);
   });
   test('when list has only one blog, equels that', () => {
@@ -105,5 +110,25 @@ describe('most blogs', () => {
       blogs: 3,
     };
     expect(mostBlogs(mockBlogs)).toEqual(correctBlog);
+  });
+});
+
+describe('most likes', () => {
+  test('of empty list is undefined', () => {
+    expect(mostLikes([])).toBe(undefined);
+  });
+  test('when list has only one blog, equels that', () => {
+    const singleItem = mockBlogs.slice(0, 1);
+    expect(mostLikes(singleItem)).toEqual({
+      author: singleItem[0].author,
+      likes: singleItem[0].likes,
+    });
+  });
+  test('of a bigger list is calculated right', () => {
+    const correctBlog = {
+      author: 'Edsger W. Dijkstra',
+      likes: 17,
+    };
+    expect(mostLikes(mockBlogs)).toEqual(correctBlog);
   });
 });

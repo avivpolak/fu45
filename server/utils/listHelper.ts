@@ -17,3 +17,15 @@ export const mostBlogs = (blogs: Blog[]): {author: string; blogs: number} | unde
   if(!highest) return undefined;
   return {author: highest[0], blogs: highest[1]};
 };
+
+export const mostLikes = (blogs: Blog[]): {author: string; likes: number} | undefined => {
+  const map: {[key: string]: number} = {};
+  for (const {author, likes} of blogs) {
+    if (map[author]) map[author] += likes;
+    else map[author] = likes;
+  }
+  const counts = Object.entries(map);
+  const highest = counts.sort(([_a, a], [_b, b]) => b - a)[0];
+  if(!highest) return undefined;
+  return {author: highest[0], likes: highest[1]};
+};
