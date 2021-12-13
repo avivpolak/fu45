@@ -1,4 +1,4 @@
-import {totalLikes} from '../utils/listHelper';
+import {totalLikes, favoriteBlog, mostBlogs} from '../utils/listHelper';
 
 import {Blog, BlogData} from '../types/index';
 
@@ -71,5 +71,39 @@ describe('total likes', () => {
   });
   test('of a bigger list is calculated right', () => {
     expect(totalLikes(mockBlogs)).toBe(36);
+  });
+});
+
+describe('favorite blog', () => {
+  test('of empty list is undefined', () => {
+    expect(favoriteBlog([])).toBe(undefined);
+  });
+  test('when list has only one blog, equels that', () => {
+    const singleItem = mockBlogs.slice(0, 1);
+    expect(favoriteBlog(singleItem)).toEqual(singleItem[0]);
+  });
+  test('of a bigger list is calculated right', () => {
+    const correctBlog = mockBlogs[2];
+    expect(favoriteBlog(mockBlogs)).toEqual(correctBlog);
+  });
+});
+
+describe('most blogs', () => {
+  test('of empty list is zero', () => {
+    expect(mostBlogs([])).toBe(undefined);
+  });
+  test('when list has only one blog, equels that', () => {
+    const singleItem = mockBlogs.slice(0, 1);
+    expect(mostBlogs(singleItem)).toEqual({
+      author: singleItem[0].author,
+      blogs: 1,
+    });
+  });
+  test('of a bigger list is calculated right', () => {
+    const correctBlog = {
+      author: 'Robert C. Martin',
+      blogs: 3,
+    };
+    expect(mostBlogs(mockBlogs)).toEqual(correctBlog);
   });
 });
