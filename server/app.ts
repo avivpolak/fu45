@@ -1,10 +1,11 @@
 import express from 'express';
 import morgan from 'morgan';
 import mongoose from 'mongoose';
+import cors from 'cors';
 
 import {MONGO_URI} from './utils/config';
 
-import notesRouter from './routers/notesRouter';
+import blogsRouter from './routers/blogsRouter';
 
 mongoose
   .connect(MONGO_URI || 'undefined')
@@ -17,9 +18,10 @@ mongoose
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 app.use(morgan('dev'));
 
-app.use('/api/notes', notesRouter);
+app.use('/api/blogs', blogsRouter);
 
 export default app;
