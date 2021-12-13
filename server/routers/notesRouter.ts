@@ -1,11 +1,11 @@
 import express from 'express';
 
 import {
-	allNotes,
-	singleNoteById,
-	addNewNote,
-	deleteSingleNoteById,
-	updateSingleNoteById
+  allNotes,
+  singleNoteById,
+  addNewNote,
+  deleteSingleNoteById,
+  updateSingleNoteById,
 } from '../controllers/notes';
 
 const notesRouter = express.Router();
