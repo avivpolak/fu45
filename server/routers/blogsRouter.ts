@@ -1,19 +1,19 @@
 import express from 'express';
 
 import {
-  allNotes,
-  singleNoteById,
-  addNewNote,
-  deleteSingleNoteById,
-  updateSingleNoteById,
-} from '../controllers/notes';
+  addBlog,
+  deleteBlogById,
+  getAllBlogs,
+  getBlogById,
+  updateBlogById,
+} from '../controllers/blogsController';
 
-const notesRouter = express.Router();
+const router = express.Router();
 
-notesRouter.get('/', allNotes);
-notesRouter.get('/:id', singleNoteById);
-notesRouter.post('/', addNewNote);
-notesRouter.delete('/:id', deleteSingleNoteById);
-notesRouter.put('/:id', updateSingleNoteById);
+router.get('/', getAllBlogs);
+router.get('/:id', getBlogById);
+router.post('/', addBlog);
+router.delete('/:id', deleteBlogById);
+router.put('/:id', updateBlogById);
 
-export default notesRouter;
+export default router;
