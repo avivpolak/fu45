@@ -1,11 +1,27 @@
 import {Blog, BlogData} from '../types/index';
 
 export const newBlog = {
-    title: 'New Blog Title',
-    author: 'New Author',
-    url: 'https://reactpatterns.com/',
-    likes: 17,
-  };
+  title: 'New Blog Title',
+  author: 'New Author',
+  url: 'https://reactpatterns.com/',
+  likes: 17,
+};
+
+export const newBlogMissingLikes = {
+  title: 'New Blog Title no likes',
+  author: 'New Author',
+  url: 'https://reactpatterns.com/',
+};
+export const newBlogMissingTitle = {
+  author: 'New Author',
+  url: 'https://reactpatterns.com/',
+  likes: 13,
+};
+export const newBlogMissingUrl = {
+  title: 'New Blog Title no url',
+  author: 'New Author',
+  likes: 4,
+};
 
 export const mockBlogsData: BlogData[] = [
   {

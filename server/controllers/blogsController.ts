@@ -24,7 +24,9 @@ export const getBlogById: Handler = async (req, res, next) => {
 
 export const addBlog: Handler = async (req, res, next) => {
   try {
-    const {title, author, url, likes} = req.body;
+    let {title, author, url, likes} = req.body;
+	 if(!likes) likes = 0;
+	 if(!(title && url && title.trim() && url.trim())) res.sendStatus(400);
     const blog = await Blog.create({
       title,
       author,

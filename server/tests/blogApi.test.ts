@@ -3,7 +3,13 @@ import mongoose from 'mongoose';
 
 import {BlogData} from '../types/index';
 
-import {mockBlogs, newBlog} from './mocks';
+import {
+  mockBlogs,
+  newBlog,
+  newBlogMissingLikes,
+  newBlogMissingUrl,
+  newBlogMissingTitle,
+} from './mocks';
 
 import Blog from '../models/Blogs';
 import app from '../app';
@@ -61,6 +67,27 @@ describe('POST /api/blogs/', () => {
 
     delete blog.id;
     expect(blog).toEqual(newBlog);
+  });
+
+  test('if no likes provided set them to 0', async () => {
+    const {body: blog} = await api
+      .post(`/api/blogs/`)
+      .send(newBlogMissingLikes)
+      .expect(200)
+      .expect('Content-Type', /application\/json/);
+
+    expect(blog.likes).toBe(0);
+  });
+
+  test('if no title or url provided return 400', async () => {
+    await api
+      .post(`/api/blogs/`)
+      .send(newBlogMissingTitle)
+      .expect(400);
+    await api
+      .post(`/api/blogs/`)
+      .send(newBlogMissingUrl)
+      .expect(400);
   });
 });
 
