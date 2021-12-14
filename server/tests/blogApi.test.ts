@@ -91,6 +91,22 @@ describe('POST /api/blogs/', () => {
   });
 });
 
+describe('DELETE /api/blogs/:id', () => {
+	let beforeLength: number;
+  test('if bad id, return 400', async () => {
+    beforeLength = (await api.get('/api/blogs')).body.length;
+    await api.delete(`/api/blogs/notAnObjectId`).expect(400);
+  });
+  test('delete the user', async () => {
+    await api.delete(`/api/blogs/${blogId}`).expect(204);
+    const {body: blogs} = await api.get('/api/blogs');
+    expect(blogs.length).toBe(beforeLength - 1);
+  });
+  test('if non existing id, return 404', async () => {
+    await api.delete(`/api/blogs/${blogId}`).expect(404);
+  });
+});
+
 afterAll(() => {
   mongoose.connection.close();
 });

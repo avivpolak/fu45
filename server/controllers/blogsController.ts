@@ -1,4 +1,5 @@
 import {Handler} from 'express';
+import {isValidObjectId} from 'mongoose';
 
 import Blog from '../models/Blogs';
 
@@ -25,8 +26,8 @@ export const getBlogById: Handler = async (req, res, next) => {
 export const addBlog: Handler = async (req, res, next) => {
   try {
     let {title, author, url, likes} = req.body;
-	 if(!likes) likes = 0;
-	 if(!(title && url && title.trim() && url.trim())) res.sendStatus(400);
+    if (!likes) likes = 0;
+    if (!(title && url && title.trim() && url.trim())) res.sendStatus(400);
     const blog = await Blog.create({
       title,
       author,
@@ -42,8 +43,9 @@ export const addBlog: Handler = async (req, res, next) => {
 export const deleteBlogById: Handler = async (req, res, next) => {
   try {
     const {id} = req.params;
+    if (!isValidObjectId(id)) res.sendStatus(400);
     const blog = await Blog.findByIdAndDelete(id);
-    if (!blog) res.send(404);
+    if (!blog) res.sendStatus(404);
     res.send(204);
   } catch (error) {
     next(error);
