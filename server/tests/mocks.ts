@@ -1,4 +1,4 @@
-import { BlogData, Blog } from '../types/index';
+import {BlogData, Blog} from '../types/index';
 
 export const newBlog = {
   title: 'New Blog Title',
@@ -81,3 +81,10 @@ export const fromDataToBlogs = (data: BlogData[]): Blog[] =>
   data.map(({_id, __v, ...rest}) => ({...rest}));
 
 export const mockBlogs = fromDataToBlogs(mockBlogsData);
+
+export const mockUsers = [
+  {username: 'User 1', name: 'Name 1', password: '123456'},
+  {username: 'User 2', name: 'Name 2', password: '123456'},
+  {username: 'User 3', name: 'Name 3', password: '123456'},
+  {username: 'User 4', name: 'Name 4', password: '123456'},
+];
