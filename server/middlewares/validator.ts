@@ -1,5 +1,5 @@
 import Joi from "joi";
-import { Handler, Request } from "express";
+import { Handler } from "express";
 import { isValidObjectId } from "mongoose";
 import { AddBlogRequest, IdRequest, UpdateBlogRequest } from "../types";
 
