@@ -1,4 +1,5 @@
 import {Request} from 'express';
+
 export interface Blog {
   author: string;
   title: string;
@@ -21,7 +22,7 @@ export interface AuthRequest extends Request {
   user?: AuthPayload;
 }
 
-export interface ValidatedAuthIdRequest extends Request {
+export interface AuthIdRequest extends Request {
   user?: AuthPayload;
   validated?: ValidatedId;
 }
@@ -35,6 +36,7 @@ export interface ValidatedId {
 }
 
 export interface AddBlogRequest extends Request {
+  user?: AuthPayload;
   validated?: ValidatedAddBlog;
 }
 

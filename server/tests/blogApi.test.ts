@@ -23,24 +23,26 @@ import app from '../app';
 
 const api = supertest(app);
 
-beforeAll(async ()=>{
-	Blog.deleteMany({});
-	User.deleteMany({});
-})
+beforeAll(async () => {
+  Blog.deleteMany({});
+  User.deleteMany({});
+});
 
 describe('/api/blogs', () => {
-  let token = '';
+  let token: string;
+  let userId: string;
 
   beforeAll(async () => {
     //TODO make a util
-    await api
+    const {body: bodyUser} = await api
       .post('/api/auth/register')
       .send({username: 'username', password: 'password', name: 'name'});
+    userId = bodyUser.id;
     const {body} = await api
       .post('/api/auth/login')
       .send({username: 'username', password: 'password'});
     token = body.token;
-  });
+  }, 30000);
 
   beforeEach(async () => {
     await Blog.deleteMany({});
@@ -88,7 +90,7 @@ describe('/api/blogs', () => {
     test('single blog is returned as json and save correctly', async () => {
       const {body: blog} = await api
         .post(`/api/blogs/`)
-		  .set('authorization', token)
+        .set('authorization', token)
         .send(newBlog)
         .expect(200)
         .expect('Content-Type', /application\/json/);
@@ -97,13 +99,13 @@ describe('/api/blogs', () => {
       expect(blogs.length).toBe(beforeLength + 1);
 
       delete blog.id;
-      expect(blog).toEqual(newBlog);
+      expect(blog).toEqual({...newBlog, user: userId});
     });
 
     test('if no likes provided set them to 0', async () => {
       const {body: blog} = await api
         .post(`/api/blogs/`)
-		  .set('authorization', token)
+        .set('authorization', token)
         .send(newBlogMissingLikes)
         .expect(200)
         .expect('Content-Type', /application\/json/);
@@ -114,34 +116,58 @@ describe('/api/blogs', () => {
     test('if no title or url provided return 400', async () => {
       await api
         .post(`/api/blogs/`)
-		  .set('authorization', token)
+        .set('authorization', token)
         .send(newBlogMissingTitle)
         .expect(400);
       await api
         .post(`/api/blogs/`)
-		  .set('authorization', token)
+        .set('authorization', token)
         .send(newBlogMissingUrl)
         .expect(400);
     });
   });
 
   describe('DELETE /api/blogs/:id', () => {
-    test('if bad id, return 400', async () => {
-      await api.delete(`/api/blogs/notAnObjectId`).expect(400);
+    test('if no authorization header return 403', async () => {
+      await api.delete(`/api/blogs/123`).expect(403);
     });
-    test('delete the user', async () => {
+    test('if bad id, return 400', async () => {
+      await api
+        .delete(`/api/blogs/notAnObjectId`)
+        .set('authorization', token)
+        .expect(400);
+    });
+    test('if post not created by user return 404', async () => {
       const {body} = await api.get('/api/blogs');
       const blogId = body[0].id;
-      const beforeLength = (await api.get('/api/blogs')).body.length;
+      await api
+        .delete(`/api/blogs/${blogId}`)
+        .set('authorization', token)
+        .expect(404);
+    });
+    test('delete the user', async () => {
+      const {body: blog} = await api
+        .post('/api/blogs')
+        .set('authorization', token)
+        .send(newBlog).expect(200);
+      const {body} = await api.get('/api/blogs');
+      const beforeLength = body.length;
 
-      await api.delete(`/api/blogs/${blogId}`).expect(204);
+      const blogId = blog.id;
+      await api
+        .delete(`/api/blogs/${blogId}`)
+        .set('authorization', token)
+        .expect(204);
 
       const {body: blogs} = await api.get('/api/blogs');
       expect(blogs.length).toBe(beforeLength - 1);
     });
     test('if non existing id, return 404', async () => {
       const nonExistingId = new ObjectId();
-      await api.delete(`/api/blogs/${nonExistingId}`).expect(404);
+      await api
+        .delete(`/api/blogs/${nonExistingId}`)
+        .set('authorization', token)
+        .expect(404);
     });
   });
 

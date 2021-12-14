@@ -17,6 +17,11 @@ const blogSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  user: {
+	type: String,
+	//TODO update to true
+	required: false
+  }
 });
 
 blogSchema.set('toJSON', {
