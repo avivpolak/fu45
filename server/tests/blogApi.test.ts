@@ -1,5 +1,6 @@
 import supertest from 'supertest';
 import mongoose from 'mongoose';
+const {ObjectId} = mongoose.Types;
 
 import {BlogData} from '../types/index';
 
@@ -16,12 +17,10 @@ import app from '../app';
 
 const api = supertest(app);
 
-beforeAll(async () => {
+beforeEach(async () => {
   await Blog.deleteMany({});
   await Blog.insertMany(mockBlogs);
 }, 30000);
-
-let blogId: string;
 
 describe('GET /api/blogs', () => {
   test('blogs are returned as json', async () => {
@@ -32,24 +31,24 @@ describe('GET /api/blogs', () => {
   });
   test('all the blogs are returned', async () => {
     const {body} = await api.get('/api/blogs');
-    blogId = body[0].id;
     expect(body.length).toBe(mockBlogs.length);
   });
 });
 
 describe('GET /api/blogs/:id', () => {
-  test('single blog is returned as json', async () => {
-    await api
+  test('single blog is returned as json with id and not _id or __v', async () => {
+    const {body} = await api.get('/api/blogs');
+    const blogId = body[0].id;
+    const {body: blog} = await api
       .get(`/api/blogs/${blogId}`)
       .expect(200)
       .expect('Content-Type', /application\/json/);
-  });
-
-  test('blog is returned with id and not _id or __v', async () => {
-    const {body: blog} = await api.get(`/api/blogs/${blogId}`);
     expect(blog.id).toBeDefined();
     expect(blog._id).not.toBeDefined();
     expect(blog.__v).not.toBeDefined();
+  });
+  test('if bad id, return 400', async () => {
+    await api.get(`/api/blogs/notAnObjectId`).expect(400);
   });
 });
 
@@ -92,18 +91,57 @@ describe('POST /api/blogs/', () => {
 });
 
 describe('DELETE /api/blogs/:id', () => {
-	let beforeLength: number;
   test('if bad id, return 400', async () => {
-    beforeLength = (await api.get('/api/blogs')).body.length;
     await api.delete(`/api/blogs/notAnObjectId`).expect(400);
   });
   test('delete the user', async () => {
+    const {body} = await api.get('/api/blogs');
+    const blogId = body[0].id;
+    const beforeLength = (await api.get('/api/blogs')).body.length;
+
     await api.delete(`/api/blogs/${blogId}`).expect(204);
+
     const {body: blogs} = await api.get('/api/blogs');
     expect(blogs.length).toBe(beforeLength - 1);
   });
   test('if non existing id, return 404', async () => {
-    await api.delete(`/api/blogs/${blogId}`).expect(404);
+    const nonExistingId = new ObjectId();
+    await api.delete(`/api/blogs/${nonExistingId}`).expect(404);
+  });
+});
+
+describe('PATCH /api/blogs/:id', () => {
+  test('if bad id, return 400', async () => {
+    await api.patch(`/api/blogs/notAnObjectId`).expect(400);
+  });
+  test('if non existing id, return 404', async () => {
+    const nonExistingId = new ObjectId();
+    await api
+      .patch(`/api/blogs/${nonExistingId}`)
+      .send({url: 'url'})
+      .expect(404);
+  });
+  test('update the values', async () => {
+    const newTitle = 'new title';
+    const newUrl = 'new url';
+    const newLikes = 111;
+    const {body} = await api.get('/api/blogs');
+    const blogId = body[0].id;
+
+    let {body: blog} = await api
+      .patch(`/api/blogs/${blogId}`)
+      .send({url: newUrl})
+      .expect(200);
+    blog = (await api.get(`/api/blogs/${blogId}`)).body;
+    expect(blog.url).toBe(newUrl);
+
+    blog = (await api
+      .patch(`/api/blogs/${blogId}`)
+      .send({title: newTitle, likes: newLikes})
+      .expect(200)).body;
+    blog = (await api.get(`/api/blogs/${blogId}`)).body;
+    expect(blog.title).toBe(newTitle);
+    expect(blog.likes).toBe(newLikes);
   });
 });
 

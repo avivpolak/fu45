@@ -3,6 +3,7 @@ import {isValidObjectId} from 'mongoose';
 
 import Blog from '../models/Blogs';
 
+// TODO extract all validations to validate midleware
 export const getAllBlogs: Handler = async (req, res, next) => {
   try {
     const blogs = await Blog.find({});
@@ -15,8 +16,9 @@ export const getAllBlogs: Handler = async (req, res, next) => {
 export const getBlogById: Handler = async (req, res, next) => {
   try {
     const {id} = req.params;
+    if (!isValidObjectId(id)) res.sendStatus(400);
     const blog = await Blog.findById(id);
-    if (!blog) res.send(404);
+    if (!blog) res.sendStatus(404);
     res.send(blog);
   } catch (error) {
     next(error);
@@ -46,7 +48,7 @@ export const deleteBlogById: Handler = async (req, res, next) => {
     if (!isValidObjectId(id)) res.sendStatus(400);
     const blog = await Blog.findByIdAndDelete(id);
     if (!blog) res.sendStatus(404);
-    res.send(204);
+    res.sendStatus(204);
   } catch (error) {
     next(error);
   }
@@ -55,9 +57,11 @@ export const deleteBlogById: Handler = async (req, res, next) => {
 export const updateBlogById: Handler = async (req, res, next) => {
   try {
     const {id} = req.params;
+    if (!isValidObjectId(id)) res.sendStatus(400);
     const {title, likes, url} = req.body;
+	 if(!(title || likes || url)) res.sendStatus(400);
     const blog = await Blog.findByIdAndUpdate(id, {likes, title, url});
-    if (!blog) res.send(404);
+    if (!blog) res.sendStatus(404);
     res.send(blog);
   } catch (error) {
     next(error);
