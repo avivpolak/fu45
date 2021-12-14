@@ -1,7 +1,8 @@
 import {Handler} from 'express';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
-import {HASH_SALT} from '../utils/config';
+import {SALT_ROUNDS, JWT_SECRET} from '../utils/config';
 
 import {LoginRequest, RegisterRequest} from '../types/index';
 
@@ -12,9 +13,13 @@ export const login: Handler = async (req: LoginRequest, res, next) => {
     if (!req.validated) throw Error('No validated obj');
     const {username, password} = req.validated;
     const user = await User.findOne({username});
-    if (!user) res.status(400).send('No such username');
+    if (!user) return res.status(400).send('No such username');
     if (!(await bcrypt.compare(password, user.password)))
-      res.status(400).send('Bad password');
+      return res.status(400).send('Bad password');
+
+    const token = await jwt.sign({username, name: user.name}, JWT_SECRET);
+
+    res.send({token});
   } catch (error) {
     next(error);
   }
@@ -25,10 +30,16 @@ export const register: Handler = async (req: RegisterRequest, res, next) => {
     if (!req.validated) throw Error('No validated obj');
     const {name, username, password} = req.validated;
     const exists = await User.findOne({username});
-    if (exists) res.status(400).send('User already exists');
+    if (exists) return res.status(400).send('User already exists');
 
-    const hashedPassword = bcrypt.hash(password, HASH_SALT);
-    const user = await User.create({username, name, password: hashedPassword});
+    const salt = await bcrypt.genSalt(+SALT_ROUNDS);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    const user = await User.create({
+      username,
+      name,
+      salt,
+      password: hashedPassword,
+    });
     res.send(user);
   } catch (error) {
     next(error);

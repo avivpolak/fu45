@@ -3,12 +3,18 @@ import mongoose from 'mongoose';
 const {ObjectId} = mongoose.Types;
 
 import {
-  mockUsers,
   mockBlogs,
   newBlog,
   newBlogMissingLikes,
   newBlogMissingUrl,
   newBlogMissingTitle,
+} from './mocks';
+
+import {
+  newUser,
+  newUserMissingName,
+  newUserMissingPassword,
+  newUserMissingUsername,
 } from './mocks';
 
 import Blog from '../models/Blogs';
@@ -150,14 +156,67 @@ describe('/api/blogs', () => {
 });
 
 describe.only('/api/auth', () => {
-  beforeEach(async () => {
+  beforeAll(async () => {
     await User.deleteMany({});
-    await User.insertMany(mockUsers);
   }, 30000);
 
-  describe('', () => {
-    test('', async () => {
-		 expect(1).toBe(2);
+  describe('POST /api/auth/register', () => {
+    test('if no username, name, password returns 400', async () => {
+      await api
+        .post('/api/auth/register')
+        .send(newUserMissingName)
+        .expect(400);
+      await api
+        .post('/api/auth/register')
+        .send(newUserMissingPassword)
+        .expect(400);
+      await api
+        .post('/api/auth/register')
+        .send(newUserMissingUsername)
+        .expect(400);
+    });
+    test('saves the new user in the DB, hash the pass, if alredy exists return 400', async () => {
+      const {body: user} = await api
+        .post('/api/auth/register')
+        .send(newUser)
+        .expect(200);
+      expect(user.username).toBe(newUser.username);
+      expect(user.name).toBe(newUser.name);
+      expect(user.password).not.toBe(newUser.password);
+      await api
+        .post('/api/auth/register')
+        .send(newUser)
+        .expect(400);
+    });
+  });
+
+  describe('POST /api/auth/login', () => {
+    test('if no username, password returns 400', async () => {
+      await api
+        .post('/api/auth/login')
+        .send(newUserMissingPassword)
+        .expect(400);
+      await api
+        .post('/api/auth/login')
+        .send(newUserMissingUsername)
+        .expect(400);
+    });
+    test('bad pass or bad username -> 400', async () => {
+      await api
+        .post('/api/auth/login')
+        .send({username: 'bad username', password: newUser.password})
+        .expect(400);
+      await api
+        .post('/api/auth/login')
+        .send({username: newUser.username, password: 'bad pass'})
+        .expect(400);
+    });
+    test('good login returns token ', async () => {
+      const {body: {token}} = await api
+        .post('/api/auth/login')
+        .send(newUser)
+        .expect(200);
+		expect(token).toBeDefined();
     });
   });
 });

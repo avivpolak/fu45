@@ -6,6 +6,7 @@ import cors from 'cors';
 import {MONGO_URI, NODE_ENV} from './utils/config';
 
 import blogsRouter from './routers/blogsRouter';
+import authRouter from './routers/authRouter';
 
 mongoose
   .connect(MONGO_URI || 'undefined')
@@ -23,5 +24,6 @@ app.use(express.json());
 if (NODE_ENV !== 'test') app.use(morgan('dev'));
 
 app.use('/api/blogs', blogsRouter);
+app.use('/api/auth', authRouter);
 
 export default app;

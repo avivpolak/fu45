@@ -82,9 +82,20 @@ export const fromDataToBlogs = (data: BlogData[]): Blog[] =>
 
 export const mockBlogs = fromDataToBlogs(mockBlogsData);
 
-export const mockUsers = [
-  {username: 'User 1', name: 'Name 1', password: '123456'},
-  {username: 'User 2', name: 'Name 2', password: '123456'},
-  {username: 'User 3', name: 'Name 3', password: '123456'},
-  {username: 'User 4', name: 'Name 4', password: '123456'},
-];
+export const newUser = {
+  name: 'Test',
+  password: '123456',
+  username: 'testNewUser',
+};
+export const newUserMissingUsername = {
+  name: 'Test',
+  password: '123456',
+};
+export const newUserMissingName = {
+  username: 'testUser',
+  password: '123456',
+};
+export const newUserMissingPassword = {
+  username: 'testUser',
+  name: 'Test',
+};
