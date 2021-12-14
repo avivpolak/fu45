@@ -40,3 +40,22 @@ export interface ValidatedUpdateBlog {
 }
 
 export type UpdateBlogQuery = Omit<ValidatedUpdateBlog, "id">;
+
+export interface LoginRequest extends Request {
+  validated?: ValidatedLogin;
+}
+
+export interface ValidatedLogin {
+  password: string;
+  username: string;
+}
+
+export interface RegisterRequest extends Request {
+  validated?: ValidatedRegister;
+}
+
+export interface ValidatedRegister{
+  password: string;
+  username: string;
+  name: string;
+}

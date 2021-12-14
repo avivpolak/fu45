@@ -1,33 +1,47 @@
-import Joi from "joi";
-import { Handler } from "express";
-import { isValidObjectId } from "mongoose";
-import { AddBlogRequest, IdRequest, UpdateBlogRequest } from "../types";
+import Joi from 'joi';
+import {Handler} from 'express';
+import {isValidObjectId} from 'mongoose';
+import {
+  AddBlogRequest,
+  IdRequest,
+  UpdateBlogRequest,
+  LoginRequest,
+  RegisterRequest,
+} from '../types';
 
 export const validateId: Handler = (req: IdRequest, res, next) => {
-  const { id } = req.params;
+  const {id} = req.params;
   if (!isValidObjectId(id)) res.sendStatus(400);
-  req.validated = { id };
+  req.validated = {id};
 
   next();
 };
 
+export const validateLogin: Handler = (req: LoginRequest, res, next) => {};
+
+export const validateRegister: Handler = (
+  req: RegisterRequest,
+  res,
+  next,
+) => {};
+
 export const validateAddBlog: Handler = (req: AddBlogRequest, res, next) => {
-  let { title, author, url, likes } = req.body;
+  let {title, author, url, likes} = req.body;
   if (!likes) likes = 0;
   if (!(title && title.trim() && url && url.trim() && author && author.trim()))
     res.sendStatus(400);
 
-  req.validated = { title, author, url, likes };
+  req.validated = {title, author, url, likes};
   next();
 };
 
 export const validateUpdateBlog: Handler = (
   req: UpdateBlogRequest,
   res,
-  next
+  next,
 ) => {
-  let { title, url, likes } = req.body;
-  const { id } = req.params;
+  let {title, url, likes} = req.body;
+  const {id} = req.params;
   if (!isValidObjectId(id)) res.sendStatus(400);
   if (
     !(title && title.trim()) &&
@@ -36,7 +50,7 @@ export const validateUpdateBlog: Handler = (
   )
     res.sendStatus(400);
 
-  req.validated = { title, url, likes, id };
+  req.validated = {title, url, likes, id};
 
   next();
 };
