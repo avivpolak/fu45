@@ -5,8 +5,6 @@ import {
   mostLikes,
 } from '../utils/listHelper';
 
-import {Blog, BlogData} from '../types/index';
-
 import { mockBlogs } from './mocks';
 
 describe('total likes', () => {

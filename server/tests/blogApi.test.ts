@@ -2,8 +2,6 @@ import supertest from 'supertest';
 import mongoose from 'mongoose';
 const {ObjectId} = mongoose.Types;
 
-import {BlogData} from '../types/index';
-
 import {
   mockBlogs,
   newBlog,

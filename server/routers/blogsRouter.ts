@@ -1,4 +1,4 @@
-import express from 'express';
+import express from "express";
 
 import {
   addBlog,
@@ -6,14 +6,20 @@ import {
   getAllBlogs,
   getBlogById,
   updateBlogById,
-} from '../controllers/blogsController';
+} from "../controllers/blogsController";
+
+import {
+  validateAddBlog,
+  validateId,
+  validateUpdateBlog,
+} from "../middlewares/validator";
 
 const router = express.Router();
 
-router.get('/', getAllBlogs);
-router.get('/:id', getBlogById);
-router.post('/', addBlog);
-router.delete('/:id', deleteBlogById);
-router.patch('/:id', updateBlogById);
+router.get("/", getAllBlogs);
+router.get("/:id", validateId, getBlogById);
+router.post("/", validateAddBlog, addBlog);
+router.delete("/:id", validateId, deleteBlogById);
+router.patch("/:id", validateUpdateBlog, updateBlogById);
 
 export default router;

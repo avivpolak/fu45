@@ -1,4 +1,4 @@
-import {Blog, BlogData} from '../types/index';
+import { BlogData, Blog } from '../types/index';
 
 export const newBlog = {
   title: 'New Blog Title',

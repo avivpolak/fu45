@@ -1,9 +1,15 @@
-import {Handler} from 'express';
-import {isValidObjectId} from 'mongoose';
+import { Handler } from "express";
 
-import Blog from '../models/Blogs';
+import {
+  IdRequest,
+  AddBlogRequest,
+  UpdateBlogRequest,
+  UpdateBlogQuery,
+} from "../types";
 
-// TODO extract all validations to validate midleware
+import Blog from "../models/Blogs";
+import { UpdateQuery } from "mongoose";
+
 export const getAllBlogs: Handler = async (req, res, next) => {
   try {
     const blogs = await Blog.find({});
@@ -13,10 +19,10 @@ export const getAllBlogs: Handler = async (req, res, next) => {
   }
 };
 
-export const getBlogById: Handler = async (req, res, next) => {
+export const getBlogById: Handler = async (req: IdRequest, res, next) => {
   try {
-    const {id} = req.params;
-    if (!isValidObjectId(id)) res.sendStatus(400);
+    if (!req.validated) throw Error("No validated obj");
+    const { id } = req.validated;
     const blog = await Blog.findById(id);
     if (!blog) res.sendStatus(404);
     res.send(blog);
@@ -25,9 +31,10 @@ export const getBlogById: Handler = async (req, res, next) => {
   }
 };
 
-export const addBlog: Handler = async (req, res, next) => {
+export const addBlog: Handler = async (req: AddBlogRequest, res, next) => {
   try {
-    let {title, author, url, likes} = req.body;
+    if (!req.validated) throw Error("No validated obj");
+    let { title, author, url, likes } = req.validated;
     if (!likes) likes = 0;
     if (!(title && url && title.trim() && url.trim())) res.sendStatus(400);
     const blog = await Blog.create({
@@ -42,10 +49,10 @@ export const addBlog: Handler = async (req, res, next) => {
   }
 };
 
-export const deleteBlogById: Handler = async (req, res, next) => {
+export const deleteBlogById: Handler = async (req: IdRequest, res, next) => {
   try {
-    const {id} = req.params;
-    if (!isValidObjectId(id)) res.sendStatus(400);
+    if (!req.validated) throw Error("No validated obj");
+    const { id } = req.validated;
     const blog = await Blog.findByIdAndDelete(id);
     if (!blog) res.sendStatus(404);
     res.sendStatus(204);
@@ -54,13 +61,19 @@ export const deleteBlogById: Handler = async (req, res, next) => {
   }
 };
 
-export const updateBlogById: Handler = async (req, res, next) => {
+export const updateBlogById: Handler = async (
+  req: UpdateBlogRequest,
+  res,
+  next
+) => {
   try {
-    const {id} = req.params;
-    if (!isValidObjectId(id)) res.sendStatus(400);
-    const {title, likes, url} = req.body;
-	 if(!(title || likes || url)) res.sendStatus(400);
-    const blog = await Blog.findByIdAndUpdate(id, {likes, title, url});
+    if (!req.validated) throw Error("No validated obj");
+    const { id, title, likes, url } = req.validated;
+    const blog = await Blog.findByIdAndUpdate(id, {
+      title,
+      likes,
+      url,
+    } as UpdateQuery<UpdateBlogQuery>);
     if (!blog) res.sendStatus(404);
     res.send(blog);
   } catch (error) {
