@@ -17,7 +17,10 @@ export const login: Handler = async (req: LoginRequest, res, next) => {
     if (!(await bcrypt.compare(password, user.password)))
       return res.status(400).send('Bad password');
 
-    const token = await jwt.sign({username, name: user.name}, JWT_SECRET);
+    const token = await jwt.sign(
+      {username, name: user.name, id: user.id},
+      JWT_SECRET,
+    );
 
     res.send({token});
   } catch (error) {

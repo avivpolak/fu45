@@ -23,7 +23,25 @@ import app from '../app';
 
 const api = supertest(app);
 
+beforeAll(async ()=>{
+	Blog.deleteMany({});
+	User.deleteMany({});
+})
+
 describe('/api/blogs', () => {
+  let token = '';
+
+  beforeAll(async () => {
+    //TODO make a util
+    await api
+      .post('/api/auth/register')
+      .send({username: 'username', password: 'password', name: 'name'});
+    const {body} = await api
+      .post('/api/auth/login')
+      .send({username: 'username', password: 'password'});
+    token = body.token;
+  });
+
   beforeEach(async () => {
     await Blog.deleteMany({});
     await Blog.insertMany(mockBlogs);
@@ -61,9 +79,16 @@ describe('/api/blogs', () => {
 
   describe('POST /api/blogs/', () => {
     const beforeLength = mockBlogs.length;
+    test('if no authorization header return 403', async () => {
+      await api
+        .post(`/api/blogs/`)
+        .send(newBlog)
+        .expect(403);
+    });
     test('single blog is returned as json and save correctly', async () => {
       const {body: blog} = await api
         .post(`/api/blogs/`)
+		  .set('authorization', token)
         .send(newBlog)
         .expect(200)
         .expect('Content-Type', /application\/json/);
@@ -78,6 +103,7 @@ describe('/api/blogs', () => {
     test('if no likes provided set them to 0', async () => {
       const {body: blog} = await api
         .post(`/api/blogs/`)
+		  .set('authorization', token)
         .send(newBlogMissingLikes)
         .expect(200)
         .expect('Content-Type', /application\/json/);
@@ -88,10 +114,12 @@ describe('/api/blogs', () => {
     test('if no title or url provided return 400', async () => {
       await api
         .post(`/api/blogs/`)
+		  .set('authorization', token)
         .send(newBlogMissingTitle)
         .expect(400);
       await api
         .post(`/api/blogs/`)
+		  .set('authorization', token)
         .send(newBlogMissingUrl)
         .expect(400);
     });
@@ -155,7 +183,7 @@ describe('/api/blogs', () => {
   });
 });
 
-describe.only('/api/auth', () => {
+describe('/api/auth', () => {
   beforeAll(async () => {
     await User.deleteMany({});
   }, 30000);
@@ -212,11 +240,13 @@ describe.only('/api/auth', () => {
         .expect(400);
     });
     test('good login returns token ', async () => {
-      const {body: {token}} = await api
+      const {
+        body: {token},
+      } = await api
         .post('/api/auth/login')
         .send(newUser)
         .expect(200);
-		expect(token).toBeDefined();
+      expect(token).toBeDefined();
     });
   });
 });

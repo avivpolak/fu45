@@ -14,11 +14,13 @@ import {
   validateUpdateBlog,
 } from "../middlewares/validator";
 
+import { authPublic } from '../middlewares/auth';
+
 const router = express.Router();
 
 router.get("/", getAllBlogs);
 router.get("/:id", validateId, getBlogById);
-router.post("/", validateAddBlog, addBlog);
+router.post("/", authPublic, validateAddBlog, addBlog);
 router.delete("/:id", validateId, deleteBlogById);
 router.patch("/:id", validateUpdateBlog, updateBlogById);
 

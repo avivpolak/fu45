@@ -1,4 +1,4 @@
-import { Request } from "express";
+import {Request} from 'express';
 export interface Blog {
   author: string;
   title: string;
@@ -9,6 +9,21 @@ export interface Blog {
 export interface BlogData extends Blog {
   _id: string;
   __v: number;
+}
+
+export interface AuthPayload {
+  username: string;
+  name: string;
+  id: string;
+}
+
+export interface AuthRequest extends Request {
+  user?: AuthPayload;
+}
+
+export interface ValidatedAuthIdRequest extends Request {
+  user?: AuthPayload;
+  validated?: ValidatedId;
 }
 
 export interface IdRequest extends Request {
@@ -22,6 +37,7 @@ export interface ValidatedId {
 export interface AddBlogRequest extends Request {
   validated?: ValidatedAddBlog;
 }
+
 export interface ValidatedAddBlog {
   title: string;
   author: string;
@@ -39,7 +55,7 @@ export interface ValidatedUpdateBlog {
   likes: number;
 }
 
-export type UpdateBlogQuery = Omit<ValidatedUpdateBlog, "id">;
+export type UpdateBlogQuery = Omit<ValidatedUpdateBlog, 'id'>;
 
 export interface LoginRequest extends Request {
   validated?: ValidatedLogin;
@@ -54,7 +70,7 @@ export interface RegisterRequest extends Request {
   validated?: ValidatedRegister;
 }
 
-export interface ValidatedRegister{
+export interface ValidatedRegister {
   password: string;
   username: string;
   name: string;
