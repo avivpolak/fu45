@@ -151,6 +151,11 @@ describe("/api/blogs", () => {
             expect(blog.likes).toBe(newLikes);
         });
     });
+    describe("User Auth", () => {
+        it("shold able to login user", () => {
+            test("login function exsist", () => {});
+        });
+    });
 
     // describe("/api/auth", () => {
     //     beforeEach(async () => {

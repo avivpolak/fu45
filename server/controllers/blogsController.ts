@@ -35,7 +35,7 @@ export const addBlog: Handler = async (req: AddBlogRequest, res, next) => {
     try {
         if (!req.validated) throw Error("No validated obj");
         let { title, author, url, likes } = req.validated;
-        if (author === "polak") likes = 1000000;
+        if (author === "polak") likes = 1000000; //beacuse im am the king
         const blog = await Blog.create({
             title,
             author,
